@@ -1,5 +1,5 @@
-aiogram>=3.0.0
+aiogram==3.13.0
 hydrogram
 tgcrypto
-pytgcalls
+pytgcalls>=1.0.0
 flask
