@@ -1,5 +1,5 @@
 """
-Telegram Multi-Account Manager & Voice Chat Auto-Joiner
+Telegram Multi-Account Manager & Voice Chat Auto-Joiner (Fixed)
 """
 
 import asyncio
@@ -25,6 +25,8 @@ from hydrogram.errors import (
 )
 from hydrogram.raw.functions.phone import JoinGroupCall, LeaveGroupCall
 from hydrogram.raw.types import InputGroupCall, InputPeerSelf
+import hydrogram.raw.functions.channels
+import hydrogram.raw.functions.messages
 
 # --- CONFIG ---
 BOT_TOKEN = os.getenv("BOT_TOKEN", "9240427294:AAFus1ftYAAK7kLjkDd2nUYMkJ3_xGTEqOU").strip()
@@ -216,16 +218,14 @@ async def join_cmd(message: Message):
 
     async def join_single(user_id, client):
         try:
-            # Step 1: Pehle group/channel join karega (agar member nahi hai toh)
             with suppress(UserAlreadyParticipant):
                 await client.join_chat(username)
 
-            # Step 2: Chat aur voice call fetch karega
             await client.get_chat(chat_id)
             full_chat = await client.invoke(
-                client.raw.functions.channels.GetFullChannel(
+                hydrogram.raw.functions.channels.GetFullChannel(
                     channel=await client.resolve_peer(chat_id)
-                ) if str(chat_id).startswith("-100") else client.raw.functions.messages.GetFullChat(
+                ) if str(chat_id).startswith("-100") else hydrogram.raw.functions.messages.GetFullChat(
                     chat_id=int(str(chat_id).replace("-", ""))
                 )
             )
@@ -233,7 +233,6 @@ async def join_cmd(message: Message):
             if not call:
                 return "Group joined, but No Active Voice Chat Found!"
 
-            # Step 3: Voice chat join karega
             await client.invoke(
                 JoinGroupCall(
                     call=InputGroupCall(call.id, call.access_hash),
@@ -244,9 +243,6 @@ async def join_cmd(message: Message):
             return True
         except Exception as exc:
             return str(exc)
-
-    import hydrogram.raw.functions.channels
-    import hydrogram.raw.functions.messages
 
     tasks = [join_single(uid, cl) for uid, cl in clients.items()]
     results = await asyncio.gather(*tasks)
@@ -292,7 +288,7 @@ async def leave_cmd(message: Message):
         try:
             await client.get_chat(chat_id)
             full_chat = await client.invoke(
-                client.raw.functions.channels.GetFullChannel(
+                hydrogram.raw.functions.channels.GetFullChannel(
                     channel=await client.resolve_peer(chat_id)
                 )
             )
