@@ -1,2 +1,2 @@
-tgcrypto
-flask
+aiogram>=3.13,<4
+Hydrogram>=0.2.0
