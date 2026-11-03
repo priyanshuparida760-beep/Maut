@@ -1,5 +1,6 @@
-aiogram==3.13.0
+aiogram
 hydrogram
 tgcrypto
 pytgcalls>=1.0.0
 flask
+pydantic<2.0
