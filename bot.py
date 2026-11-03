@@ -29,7 +29,7 @@ import hydrogram.raw.functions.channels
 import hydrogram.raw.functions.messages
 
 # --- CONFIG ---
-BOT_TOKEN = os.getenv("BOT_TOKEN", "9240427294:AAFus1ftYAAK7kLjkDd2nUYMkJ3_xGTEqOU").strip()
+BOT_TOKEN = os.getenv("BOT_TOKEN", "9240427294:AAFW_SJP-24x_Hr64NbSJIAP0_z_mDn1Yms").strip()
 API_ID_RAW = os.getenv("API_ID", "35271075").strip()
 API_HASH = os.getenv("API_HASH", "e8c3704b92160afdc08a81c1156197cc").strip()
 OWNER_ID_RAW = os.getenv("OWNER_ID", "8416917212").strip()
