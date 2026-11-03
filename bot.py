@@ -1,5 +1,5 @@
 """
-Telegram Multi-Account Manager & Voice Chat Auto-Joiner (Fixed)
+Telegram Multi-Account Manager & Voice Chat Auto-Joiner (Final Fixed)
 """
 
 import asyncio
@@ -235,7 +235,7 @@ async def join_cmd(message: Message):
 
             await client.invoke(
                 JoinGroupCall(
-                    call=InputGroupCall(call.id, call.access_hash),
+                    call=InputGroupCall(id=call.id, access_hash=call.access_hash),
                     join_as=InputPeerSelf(),
                     muted=True
                 )
@@ -296,7 +296,7 @@ async def leave_cmd(message: Message):
             if call:
                 await client.invoke(
                     LeaveGroupCall(
-                        call=InputGroupCall(call.id, call.access_hash)
+                        call=InputGroupCall(id=call.id, access_hash=call.access_hash)
                     )
                 )
             return True
