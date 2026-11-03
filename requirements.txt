@@ -1,5 +1,4 @@
 pyrogram
 pytgcalls
-PyTgCalls
-Client
 aiogram
+aiohttp
