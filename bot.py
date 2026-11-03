@@ -1,5 +1,5 @@
 """
-Telegram Multi-Account Manager & Voice Chat Joiner
+Telegram Multi-Account Manager & Voice Chat Auto-Joiner
 """
 
 import asyncio
@@ -122,13 +122,13 @@ async def start_cmd(message: Message):
     total = db.execute("SELECT COUNT(*) FROM accounts").fetchone()[0]
     online = len(clients)
     await message.answer(
-        f"🤖 **Multi-Account Manager**\n\n"
+        f"🤖 **Multi-Account Voice Chat Bot**\n\n"
         f"📱 Saved: **{total}** | 🟢 Online: **{online}**\n\n"
         "Commands:\n"
         "/addsession\n"
         "/status\n"
         "/sessions\n"
-        "/join @username (Join Voice Chat with ALL accounts)\n"
+        "/join @username (Auto Join Group + Voice Chat with ALL accounts)\n"
         "/leave @username\n"
         "/removesession ID",
         parse_mode="Markdown"
@@ -201,7 +201,7 @@ async def join_cmd(message: Message):
     if not clients:
         return await message.answer("❌ Koi account online nahi hai!")
 
-    status_msg = await message.answer(f"⚡ Joining Voice Chat with {len(clients)} accounts...")
+    status_msg = await message.answer(f"⚡ Joining Group & Voice Chat with {len(clients)} accounts...")
     try:
         username = clean_target(args[1])
     except ValueError as e:
@@ -216,6 +216,11 @@ async def join_cmd(message: Message):
 
     async def join_single(user_id, client):
         try:
+            # Step 1: Pehle group/channel join karega (agar member nahi hai toh)
+            with suppress(UserAlreadyParticipant):
+                await client.join_chat(username)
+
+            # Step 2: Chat aur voice call fetch karega
             await client.get_chat(chat_id)
             full_chat = await client.invoke(
                 client.raw.functions.channels.GetFullChannel(
@@ -226,8 +231,9 @@ async def join_cmd(message: Message):
             )
             call = full_chat.full_chat.call
             if not call:
-                return "No Active Voice Chat"
+                return "Group joined, but No Active Voice Chat Found!"
 
+            # Step 3: Voice chat join karega
             await client.invoke(
                 JoinGroupCall(
                     call=InputGroupCall(call.id, call.access_hash),
@@ -235,8 +241,6 @@ async def join_cmd(message: Message):
                     muted=True
                 )
             )
-            return True
-        except UserAlreadyParticipant:
             return True
         except Exception as exc:
             return str(exc)
@@ -255,7 +259,7 @@ async def join_cmd(message: Message):
     err_text = f"\n\n⚠️ Error: `{error_reasons[0]}`" if error_reasons else ""
 
     await status_msg.edit_text(
-        f"⚡ **Voice Chat Join Complete!**\n\n"
+        f"⚡ **Join & Voice Chat Complete!**\n\n"
         f"🟢 Success: **{success}**\n"
         f"🔴 Failed: **{fail}**{err_text}",
         parse_mode="Markdown"
